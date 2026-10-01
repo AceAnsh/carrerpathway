@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Google Path</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f6f7f9;--c:#fff;--t:#14161a;--m:#6b7280;--a:#4f7cff;--ok:#22c55e;--b:#e5e7eb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--c:#161b22;--t:#e6edf3;--m:#8b949e;--b:#30363d}}
+:root[data-theme="dark"]{--bg:#0d1117;--c:#161b22;--t:#e6edf3;--m:#8b949e;--b:#30363d}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--t);font:15px/1.4 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif}
+#app{max-width:640px;margin:auto;padding:14px 14px 90px}
+.card{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:14px;margin-bottom:12px}
+h2{margin:0 0 8px;font-size:13px;letter-spacing:.08em;color:var(--m);text-transform:uppercase}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:8px}.g .card{margin:0;padding:10px}.big{font-size:20px;font-weight:700}
+.m{color:var(--m);font-size:12px}.r{display:flex;align-items:center;gap:8px}.sp{justify-content:space-between}
+button,select,input{font:inherit;color:var(--t);background:var(--bg);border:1px solid var(--b);border-radius:10px;padding:8px 10px;max-width:100%}
+button{cursor:pointer}button.p{background:var(--a);color:#fff;border:0;font-weight:600}button.w{width:100%;padding:12px}
+input,select{width:100%;margin:3px 0 8px}input[type=checkbox]{width:auto;margin:0}input[type=range]{padding:0}
+.pb{height:10px;background:var(--b);border-radius:9px;overflow:hidden}.pb i{display:block;height:100%;background:var(--a)}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--c);border-top:1px solid var(--b);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;border-radius:0;background:none;padding:12px 2px;font-size:12px;color:var(--m)}nav button.on{color:var(--a);font-weight:700}
+.t{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--b)}.dn{text-decoration:line-through;color:var(--m)}
+.hm{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;gap:3px;overflow-x:auto}.hm i,.cal i{aspect-ratio:1;min-width:14px;border-radius:3px;background:var(--b)}
+.h1{background:#9ec5ff!important}.h2{background:var(--a)!important}.h3{background:var(--ok)!important}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal i{font-style:normal;font-size:11px;padding:3px;min-width:0;aspect-ratio:1;cursor:pointer}.cal .td{outline:2px solid var(--a)}
+.bars{display:flex;gap:3px;align-items:flex-end;height:90px}.bc{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font-size:9px;color:var(--m)}.bc i{width:100%;background:var(--a);border-radius:3px 3px 0 0}
+.tm{font-size:46px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--a);color:#fff;padding:10px 16px;border-radius:20px;z-index:9;font-weight:600}
+.cf{position:fixed;top:-10px;width:8px;height:12px;z-index:8;animation:f 2.2s ease-in forwards}@keyframes f{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+.rm{background:var(--bg);border-radius:8px;padding:8px;margin-bottom:6px}.x{color:var(--m);border:0;background:none;padding:0 4px}
+</style></head><body><div id="app"></div><nav id="nav" hidden></nav>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dk=d=>{d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+let S=null;try{S=JSON.parse(localStorage.getItem('gp'))}catch(e){}
+S=S||{p:null,ses:[],tasks:{},dsa:[],rev:[],proj:[],int:[],xp:0,xpd:{},rm:{},g:{w:28,m:120},nt:{mission:1,goal:1,streak:1,rev:1,weekly:1,deadline:1}};
+const save=()=>{try{localStorage.setItem('gp',JSON.stringify(S))}catch(e){}};
+const SUBJ=['DSA','Development','CS Fundamentals','Competitive Programming','Projects','Interview preparation','Other'];
+const TOP=['Arrays','Strings','Hashing','Linked Lists','Stack/Queue','Binary Search','Trees','Graphs','Greedy','Backtracking','Dynamic Programming'];
+const RM=[['Foundation',['Python/C++','Programming fundamentals','Git/GitHub','HTML/CSS/JavaScript','Big-O','Arrays','Strings','Linked Lists','Stack','Queue','Recursion','Sorting','Searching'],'Target: 150–200 quality DSA problems'],
+['Advanced',['Trees','Graphs','Dynamic Programming','OOP','DBMS','Operating Systems','Computer Networks','SQL','Backend development','APIs','Open source'],'Target: 350–450 total quality DSA problems'],
+['Interview Preparation',['Advanced DSA','LeetCode','System design fundamentals','CS fundamentals','Resume','Projects','Mock interviews','Internships','Open source','Networking'],''],
+['Placement',['DSA revision','System design','Behavioral interviews','Mock interviews','Resume customization','Internship conversion','Campus applications','Off-campus applications'],'']];
+const LV=[['Beginner',0],['Coder',200],['Problem Solver',500],['Developer',1000],['Interview Ready',2000],['Software Engineer',4000]];
+const ST=['Wishlist','Preparing','Applied','OA','Interview','Offer','Rejected'];
+const today=()=>dk(),addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const dm=k=>Math.round(S.ses.filter(x=>x.d==k).reduce((a,x)=>a+x.dur,0)/60);
+const goal=()=>Math.round((S.p?+S.p.hrs:4)*60);
+const fmt=m=>Math.floor(m/60)+'h '+String(Math.round(m%60)).padStart(2,'0')+'m';
+const rangeMin=(f,t)=>{let s=0;for(let d=new Date(f);d<=t;d=addDays(d,1))s+=dm(dk(d));return s};
+const ws=()=>{const d=new Date();d.setHours(0,0,0,0);return addDays(d,-((d.getDay()+6)%7))};
+const pct=(a,b)=>b?Math.min(100,Math.round(a/b*100)):0,bar=p=>`<div class=pb><i style="width:${p}%"></i></div>`;
+const lvl=()=>{let i=0;LV.forEach((l,j)=>{if(S.xp>=l[1])i=j});return i};
+function streaks(){const g=goal();let cur=0,d=new Date();if(dm(dk(d))<g)d=addDays(d,-1);while(dm(dk(d))>=g&&cur<4000){cur++;d=addDays(d,-1)}
+let best=0,run=0,ok=0,miss=0;if(S.ses.length){const f=new Date(S.ses.reduce((a,x)=>x.d<a?x.d:a,'9999')+'T00:00');for(let x=f;dk(x)<today();x=addDays(x,1)){if(dm(dk(x))>=g){run++;ok++;best=Math.max(best,run)}else{run=0;miss++}}}
+const cons=n=>{let c=0;for(let i=0;i<n;i++)if(dm(dk(addDays(new Date(),-i)))>=g)c++;return pct(c,n)};
+return{cur,best:Math.max(best,cur),ok,miss,wc:cons(7),mc:cons(30)}}
+const solved=t=>S.dsa.filter(x=>x.t==t&&x.r!='f').length;
+const curTopic=()=>TOP.find(t=>solved(t)<10)||TOP[TOP.length-1];
+const acc=a=>a.length?Math.round(a.filter(x=>x.r=='s').length/a.length*100):0;
+function weak(){const c=TOP.map(t=>[t,S.dsa.filter(x=>x.t==t)]).filter(x=>x[1].length);if(!c.length)return null;c.sort((a,b)=>acc(a[1])-acc(b[1]));return c[0][0]}
+const dsaPct=()=>Math.round(TOP.reduce((a,t)=>a+Math.min(solved(t)/10,1),0)/TOP.length*100);
+const rmPct=y=>{const n=y==null?RM.reduce((a,r)=>a+r[1].length,0):RM[y][1].length;let c=0;RM.forEach((r,i)=>{if(y==null||y==i)r[1].forEach((_,j)=>{if(S.rm[i+'-'+j])c++})});return pct(c,n)};
+function plan(){const k=today();if(S.tasks[k])return S.tasks[k];
+const g=goal(),y=S.tasks[dk(addDays(new Date(),-1))];let tot=g;if(y&&y.length&&y.filter(t=>t.done).length/y.length<.5)tot=Math.round(g*.85);
+const tp=weak()&&S.dsa.filter(x=>x.t==weak()).length>2&&acc(S.dsa.filter(x=>x.t==weak()))<60?weak():curTopic(),lv=+S.p.lvl||0,rd=S.rev.filter(r=>r.due<=k).length,pr=S.proj.find(p=>p.pr<100);
+const cs=['Process vs thread','Big-O and complexity','OOP pillars','DBMS normalization','TCP vs UDP','Memory management','SQL joins'][new Date().getDay()];
+const m=f=>Math.max(5,Math.round(tot*f/5)*5),L=[];let i=0;const a=(grp,subj,text,min)=>L.push({id:k+'_'+i++,grp,subj,text,min,done:false});
+a('DSA','DSA','Learn or recap '+tp,m(.15));a('DSA','DSA',`Solve ${3+lv} ${tp} problems`,m(.25));
+if(rd)a('DSA','DSA',`Review ${Math.min(rd,3)} problem(s) from your revision queue`,m(.1));
+a('Development','Development',pr?`Work on ${pr.n} and commit to GitHub`:'Build a small project feature and commit to GitHub',m(.3));
+a('CS Fundamentals','CS Fundamentals','Learn: '+cs,m(.15));a('Revision','DSA',"Review yesterday's concepts",m(.1));a('Career','Other','Update GitHub README or resume',m(.05));
+S.tasks[k]=L;save();return L}
+function addXp(n,w){S.xp+=n;toast(`+${n} XP — ${w}`)}
+function toast(s){const e=document.createElement('div');e.className='toast';e.textContent=s;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
+function celebrate(n){for(let i=0;i<40;i++){const e=document.createElement('i');e.className='cf';e.style.cssText=`left:${Math.random()*100}%;background:hsl(${Math.random()*360},80%,60%);animation-delay:${Math.random()*.5}s`;document.body.appendChild(e);setTimeout(()=>e.remove(),3000)}toast(`🔥 ${n} Day Streak — goal complete!`)}
+function checkGoal(){const k=today();if(dm(k)>=goal()&&!S.xpd[k]){S.xpd[k]=1;addXp(50,"Completed today's goal");const c=streaks().cur;if(c%7==0)addXp(100,c+'-day streak');celebrate(c)}}
+function tg(id){const t=plan().find(x=>x.id==id);t.done=!t.done;if(t.done&&!t.xp){t.xp=1;addXp(20,'Completed a task')}save();render()}
+/* timer */
+const TM={run:0,acc:0,t0:0,ph:'f',len:0,pom:0,st:null,mode:'p',cust:45,subj:'DSA',task:''};
+const el=()=>TM.acc+(TM.run?(Date.now()-TM.t0)/1000:0);
+function setLen(){TM.len=TM.mode=='f'?0:TM.ph=='f'?(TM.mode=='p'?1500:TM.cust*60):(TM.mode=='p'&&TM.pom%4==0?900:300)}
+function tmStart(){if(TM.run)return;if(!TM.st&&TM.ph=='f'&&!TM.acc){TM.subj=$('#ts').value;TM.task=$('#tt').value;TM.mode=$('#tmo').value;TM.cust=+$('#tc').value||45;TM.st=new Date().toISOString();setLen()}TM.run=1;TM.t0=Date.now();render()}
+function tmPause(){if(!TM.run)return;TM.acc=el();TM.run=0;render()}
+function rec(dur){const e=new Date(),k=today();S.ses.push({d:k,s:TM.st||new Date(e-dur*1000).toISOString(),e:e.toISOString(),dur:Math.round(dur),subj:TM.subj,task:TM.task,n:S.ses.filter(x=>x.d==k).length+1});
+if(TM.subj=='DSA'&&dur>=1200)addXp(20,'Completed DSA session');checkGoal();save()}
+function tmStop(){const d=el();if(TM.ph=='f'&&d>=60)rec(d);Object.assign(TM,{run:0,acc:0,ph:'f',pom:0,st:null,len:0});render()}
+setInterval(()=>{if(!TM.run)return;if(TM.len&&el()>=TM.len){if(TM.ph=='f'){TM.pom++;rec(TM.len);TM.ph='b'}else{TM.ph='f';TM.st=new Date().toISOString()}TM.acc=0;TM.t0=Date.now();setLen();toast(TM.ph=='b'?'Break time ☕':'Back to focus 🎯');render();return}
+const e=$('#tmd');if(e){const r=TM.len?Math.max(0,TM.len-el()):el();e.textContent=String(Math.floor(r/60)).padStart(2,'0')+':'+String(Math.floor(r%60)).padStart(2,'0')}},1000);
+/* dsa */
+function logP(){const n=$('#pn').value.trim();if(!n)return;S.dsa.push({n,t:$('#pt').value,d:$('#pd').value,r:$('#pr').value,date:today()});
+if($('#pr').value!='s')S.rev.push({n,t:$('#pt').value,due:dk(addDays(new Date(),1)),step:0});else addXp(10,'Solved a problem');save();render()}
+const IV=[1,3,7,14,30];
+function rvOk(i){const r=S.rev[i];r.step=Math.min(r.step+1,4);r.due=dk(addDays(new Date(),IV[r.step]));save();render()}
+function rvBad(i){const r=S.rev[i];r.step=0;r.due=dk(addDays(new Date(),1));save();render()}
+/* coach + reminders */
+function coach(){const o=[],a=ws(),k=today();let pl=0,dn=0;Object.keys(S.tasks).forEach(d=>{if(d>=dk(a)&&d<=k)S.tasks[d].forEach(t=>{if(t.grp=='DSA'){pl++;if(t.done)dn++}})});
+if(pl)o.push(`You completed ${dn} of ${pl} planned DSA tasks this week.`);
+const sm=s=>S.ses.filter(x=>x.d>=dk(a)&&x.subj==s).reduce((q,x)=>q+x.dur/60,0);if(sm('Development')>sm('DSA')&&sm('Development')>0)o.push('You are spending more time on development than DSA this week. Your roadmap recommends more DSA practice.');
+const st=streaks();if(st.cur>=3)o.push(`You've maintained your study goal for ${st.cur} consecutive days.`);
+const w=weak();if(w)o.push(`Your lowest DSA accuracy is in ${w} (${acc(S.dsa.filter(x=>x.t==w))}%). Extra practice is queued in your plan.`);
+const rd=S.rev.filter(r=>r.due<=k).length;if(rd)o.push(`${rd} problem(s) are due for revision today.`);
+return o.length?o:['Log a study session or a DSA problem and I will start giving feedback based on your data.']}
+function rem(){const n=S.nt,r=[],k=today(),g=goal(),l=g-dm(k),tm=dk(addDays(new Date(),1)),c=streaks().cur;
+if(n.mission&&dm(k)==0)r.push("Your daily mission is waiting.");if(n.goal&&l>0&&l<=30&&dm(k)>0)r.push(`${l} minutes left to reach today's goal.`);
+if(n.streak&&c>=3)r.push(`You have a ${c}-day streak 🔥`);if(n.rev&&S.rev.some(x=>x.due<=k))r.push("Time to revise your DSA problems.");
+if(n.weekly&&new Date().getDay()==0)r.push("Weekly review is ready (see Analytics).");
+if(n.deadline&&(S.int.some(x=>x.dl==tm)||S.proj.some(x=>x.dl==tm)))r.push("You have a deadline tomorrow.");return r}
+/* views */
+let V='home',CM=new Date(),SD=today();
+const go=v=>{V=v;window.scrollTo(0,0);render()};
+function ring(p,l){const c=2*Math.PI*26;return`<svg width=64 height=64 viewBox="0 0 64 64"><circle cx=32 cy=32 r=26 fill=none stroke="var(--b)" stroke-width=7 /><circle cx=32 cy=32 r=26 fill=none stroke="var(--a)" stroke-width=7 stroke-linecap=round stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 32 32)"/><text x=32 y=37 text-anchor=middle font-size=14 font-weight=700 fill="var(--t)">${l}</text></svg>`}
+function home(){const k=today(),t=plan(),g=goal(),m=dm(k),s=streaks(),h=new Date().getHours(),wk=rangeMin(ws(),new Date()),nx=t.find(x=>!x.done),dn=t.filter(x=>x.done).length;
+const q=h>=20?`Did I actually do the work today? ${fmt(m)} of ${fmt(g)} studied, ${dn}/${t.length} tasks done.`:h<12?'What exactly should I do today to get closer to becoming a Google-level software engineer?':'Keep going — here is what is left for today.';
+return`<div class="r sp"><b style="font-size:20px">Hi ${esc(S.p.name)} 👋</b><button onclick="go('road')">Lv ${lvl()+1} · ${LV[lvl()][0]}</button></div><p class=m>${q}</p>
+${rem().map(x=>`<div class=card style="padding:8px 12px">🔔 ${esc(x)}</div>`).join('')}
+<div class=g><div class=card><div class=big>🔥 ${s.cur}</div><div class=m>day streak</div></div><div class=card><div class=big>⏱ ${fmt(m)}</div><div class=m>today</div></div>
+<div class=card><div class=big>🎯 ${pct(m,g)}%</div><div class=m>daily goal</div></div><div class=card><div class=big>🧠 ${S.dsa.filter(x=>x.date==k&&x.r!='f').length}</div><div class=m>DSA solved today</div></div>
+<div class=card><div class=big>📚 ${fmt(wk)}</div><div class=m>this week</div></div><div class=card><div class=big>🚀 ${rmPct()}%</div><div class=m>roadmap</div></div>
+<div class=card><div class=big>💻 ${S.proj.filter(p=>p.pr>=100).length}/${S.proj.length}</div><div class=m>projects done</div></div><div class=card><div class=big>DSA ${dsaPct()}%</div><div class=m>progress</div></div></div>
+<div class=card style="margin-top:12px"><h2>Today's mission</h2>${bar(pct(m,g))}<p class=m>${fmt(m)} / ${fmt(g)} — ${pct(m,g)}%</p><button class="p w" onclick="go('tasks')">Start Study Session</button></div>
+<div class=card><h2>Next task</h2>${nx?esc(nx.text)+` <span class=m>· ${nx.min} min</span>`:'All tasks done 🎉'}</div>
+<div class=card><h2>Roadmap</h2>Year ${S.p.yr} → ${RM[S.p.yr-1][0]} → ${rmPct(S.p.yr-1)}%${bar(rmPct(S.p.yr-1))}</div>
+<div class=card><h2>AI coach</h2>${coach().map(x=>`<p style="margin:4px 0">• ${esc(x)}</p>`).join('')}<p class=m>Feedback is based on your logged data. Practice improves your odds but no app can guarantee interviews or offers.</p></div>`}
+function tasks(){const t=plan(),g={};t.forEach(x=>(g[x.grp]=g[x.grp]||[]).push(x));const m=dm(today()),gl=goal(),d=new Date(),mm=TM.len?Math.max(0,TM.len-el()):el();
+return`<h2>Today's mission</h2><div class=card><b>${d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</b><div>🎯 Target: ${fmt(gl)}</div><br>${bar(pct(m,gl))}<p class=m>${fmt(m)} / ${fmt(gl)} completed — ${pct(m,gl)}%</p></div>
+<div class=card><h2>Study timer ${TM.ph=='b'?'· break':''}</h2><div class=tm id=tmd>${String(Math.floor(mm/60)).padStart(2,'0')}:${String(Math.floor(mm%60)).padStart(2,'0')}</div>
+${!TM.run&&!TM.acc&&!TM.st?`<label class=m>Subject</label><select id=ts>${SUBJ.map(s=>`<option>${s}</option>`).join('')}</select><label class=m>Task</label><select id=tt><option value="">No task</option>${t.filter(x=>!x.done).map(x=>`<option>${esc(x.text)}</option>`).join('')}</select>
+<div class=r><div style="flex:1"><label class=m>Mode</label><select id=tmo><option value=p>Pomodoro 25/5</option><option value=c>Custom</option><option value=f>Free timer</option></select></div><div style="flex:1"><label class=m>Custom min</label><input id=tc type=number value=45></div></div>`:`<p class=m style="text-align:center">${esc(TM.subj)}${TM.task?' · '+esc(TM.task):''} · Sessions: ${TM.pom}</p>`}
+<div class=r>${TM.run?'<button class=w onclick=tmPause()>Pause</button>':'<button class="p w" onclick=tmStart()>'+(TM.acc||TM.st?'Resume':'Start')+'</button>'}<button class=w onclick=tmStop()>Stop</button></div><p class=m>Paused time is never counted. Short breaks 5 min, long break 15 min after 4 focus sessions.</p></div>
+${Object.keys(g).map(k=>`<div class=card><h2>${k} — ${g[k].reduce((a,x)=>a+x.min,0)} min</h2>${g[k].map(x=>`<div class=t><input type=checkbox ${x.done?'checked':''} onchange="tg('${x.id}')"><span class="${x.done?'dn':''}">${esc(x.text)} <span class=m>${x.min}m</span></span></div>`).join('')}</div>`).join('')}`}
+function dsa(){const a=S.dsa,k=today(),due=S.rev.map((r,i)=>[r,i]).filter(x=>x[0].due<=k);
+return`<div class=card><h2>DSA progress: ${dsaPct()}%</h2>${bar(dsaPct())}<div class=g style="margin-top:10px"><div><b>${a.filter(x=>x.r!='f').length}</b> <span class=m>solved</span></div><div><b>${acc(a)}%</b> <span class=m>accuracy</span></div>
+<div><b>${a.filter(x=>x.d=='Easy'&&x.r!='f').length}/${a.filter(x=>x.d=='Medium'&&x.r!='f').length}/${a.filter(x=>x.d=='Hard'&&x.r!='f').length}</b> <span class=m>E/M/H</span></div><div><b>${a.filter(x=>x.r=='s').length}</b> <span class=m>alone</span> · <b>${a.filter(x=>x.r=='h').length}</b> <span class=m>hints</span></div></div></div>
+<div class=card><h2>Topics</h2>${TOP.map(t=>`<div class="r sp m" style="margin-top:6px"><span style="width:40%">${t}</span><div style="flex:1">${bar(Math.min(solved(t)*10,100))}</div><span>${solved(t)}/10</span></div>`).join('')}</div>
+<div class=card><h2>Review today (${due.length})</h2>${due.map(([r,i])=>`<div class=t><span style="flex:1">${esc(r.n)} <span class=m>${r.t}</span></span><button onclick=rvOk(${i})>✓</button><button onclick=rvBad(${i})>✗</button></div>`).join('')||'<p class=m>Nothing due. Failed or hinted problems return at 1, 3, 7, 14, then 30 day intervals.</p>'}</div>
+<div class=card><h2>Log a problem</h2><input id=pn placeholder="Problem name / number"><select id=pt>${TOP.map(t=>`<option>${t}</option>`).join('')}</select><select id=pd><option>Easy</option><option>Medium</option><option>Hard</option></select><select id=pr><option value=s>Solved independently</option><option value=h>Solved with hints</option><option value=f>Could not solve</option></select><button class="p w" onclick=logP()>Add</button></div>`}
+function road(){const l=lvl(),nx=LV[l+1],w=ws(),wk=Math.round(rangeMin(w,new Date())/60),mo=Math.round(rangeMin(new Date(new Date().getFullYear(),new Date().getMonth(),1),new Date())/60);
+return`<div class=card><h2>Level ${l+1} — ${LV[l][0]}</h2><b>${S.xp} XP</b>${nx?bar(pct(S.xp-LV[l][1],nx[1]-LV[l][1]))+`<p class=m>${nx[1]-S.xp} XP to ${nx[0]}</p>`:''}<p class=m>Levels track practice habits only. They do not guarantee employment.</p></div>
+<div class=card><h2>4-year roadmap</h2>${RM.map((r,i)=>`<details ${i==S.p.yr-1?'open':''}><summary><b>Year ${i+1} — ${r[0]}</b> <span class=m>${rmPct(i)}%</span></summary><p class=m>${r[2]}</p>${r[1].map((x,j)=>`<div class=t><input type=checkbox ${S.rm[i+'-'+j]?'checked':''} onchange="S.rm['${i}-${j}']=this.checked;save();render()"> ${x}</div>`).join('')}</details>`).join('')}</div>
+<div class=card><h2>Goals (planned vs actual)</h2>Daily: ${fmt(goal())} — today ${fmt(dm(today()))}${bar(pct(dm(today()),goal()))}<div class=r style="margin-top:8px"><span>Weekly h</span><input type=number value=${S.g.w} onchange="S.g.w=+this.value;save();render()"></div>${bar(pct(wk,S.g.w))}<p class=m>${wk}h / ${S.g.w}h</p>
+<div class=r><span>Monthly h</span><input type=number value=${S.g.m} onchange="S.g.m=+this.value;save();render()"></div>${bar(pct(mo,S.g.m))}<p class=m>${mo}h / ${S.g.m}h</p><p class=m>Yearly: complete Year ${S.p.yr} roadmap (${rmPct(S.p.yr-1)}%). Long-term: ${esc(S.p.goal)}</p></div>
+<div class=card><h2>Portfolio: ${S.proj.filter(p=>p.pr>=100).length}/${S.proj.length} projects completed</h2>${S.proj.map((p,i)=>`<div class=rm><div class="r sp"><b>${esc(p.n)}</b><button class=x onclick="S.proj.splice(${i},1);save();render()">×</button></div><span class=m>${esc(p.tech)} ${p.dl?'· due '+p.dl:''}</span><input type=range value=${p.pr} onchange="S.proj[${i}].pr=+this.value;save();render()"><span class=m>${p.pr}%</span></div>`).join('')}
+<input id=jn placeholder="Project name"><input id=jt placeholder="Technologies"><input id=jd type=date><button class=w onclick="pj()">Add project</button></div>
+<div class=card><h2>Internships</h2>${S.int.map((p,i)=>`<div class=rm><div class="r sp"><b>${esc(p.c)}</b><button class=x onclick="S.int.splice(${i},1);save();render()">×</button></div><span class=m>${esc(p.r)} ${p.dl?'· deadline '+p.dl:''}</span><select onchange="S.int[${i}].s=this.value;save()">${ST.map(s=>`<option ${s==p.s?'selected':''}>${s}</option>`).join('')}</select></div>`).join('')}
+<input id=ic placeholder="Company"><input id=ir placeholder="Position"><input id=id type=date><button class=w onclick="it()">Add internship</button></div>
+<div class=card><h2>Reminders & settings</h2>${Object.keys(S.nt).map(k=>`<div class=t><input type=checkbox ${S.nt[k]?'checked':''} onchange="S.nt['${k}']=this.checked?1:0;save()"> ${{mission:'Daily mission waiting',goal:'Minutes left to goal',streak:'Streak reminder',rev:'Revision due',weekly:'Weekly review',deadline:'Deadline tomorrow'}[k]}</div>`).join('')}
+<div class=r style="margin-top:8px"><button onclick="th()">Toggle dark/light</button><button onclick="if(confirm('Erase all data?')){localStorage.removeItem('gp');location.reload()}">Reset</button></div></div>`}
+const pj=()=>{const n=$('#jn').value.trim();if(n){S.proj.push({n,tech:$('#jt').value,dl:$('#jd').value,pr:0});save();render()}};
+const it=()=>{const c=$('#ic').value.trim();if(c){S.int.push({c,r:$('#ir').value,dl:$('#id').value,s:'Wishlist'});save();render()}};
+function th(){const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark';try{localStorage.setItem('gpt',r.dataset.theme)}catch(e){}}
+try{const x=localStorage.getItem('gpt');if(x)document.documentElement.dataset.theme=x}catch(e){}
+const lev=(m,g)=>m<=0?'':m>g*1.25?'h3':m>=g?'h2':'h1';
+const bars=a=>{const mx=Math.max(1,...a.map(x=>x[1]));return`<div class=bars>${a.map(x=>`<div class=bc title="${fmt(x[1])}"><i style="height:${Math.max(2,x[1]/mx*80)}%"></i>${x[0]}</div>`).join('')}</div>`};
+const ev=k=>S.int.some(x=>x.dl==k)||S.proj.some(x=>x.dl==k);
+function ana(){const g=goal(),now=new Date(),t=dm(today()),wk=rangeMin(ws(),now),mo=rangeMin(new Date(now.getFullYear(),now.getMonth(),1),now),tot=Math.round(S.ses.reduce((a,x)=>a+x.dur,0)/60),s=streaks();
+const sm={};SUBJ.forEach(x=>sm[x]=0);S.ses.forEach(x=>sm[x.subj]=(sm[x.subj]||0)+x.dur/60);const smx=Math.max(1,...Object.values(sm));
+const first=S.ses.length?new Date(S.ses.reduce((a,x)=>x.d<a?x.d:a,'9999')+'T00:00'):now,nd=Math.max(1,Math.round((now-first)/864e5)+1);
+const days=[...Array(14)].map((_,i)=>{const d=addDays(now,i-13);return[d.getDate(),dm(dk(d))]});
+const wks=[...Array(8)].map((_,i)=>{const a=addDays(ws(),(i-7)*7);return[a.getDate()+'/'+(a.getMonth()+1),rangeMin(a,addDays(a,6))]});
+const mos=[...Array(6)].map((_,i)=>{const a=new Date(now.getFullYear(),now.getMonth()+i-5,1);return['JFMAMJJASOND'[a.getMonth()],rangeMin(a,new Date(a.getFullYear(),a.getMonth()+1,0))]});
+const st=addDays(ws(),-16*7),cells=[...Array(119)].map((_,i)=>{const d=addDays(st,i),k=dk(d);return d>now?'<i style="opacity:.2"></i>':`<i class="${lev(dm(k),g)}" title="${k} ${fmt(dm(k))}" onclick="SD='${k}';render()"></i>`}).join('');
+const y=CM.getFullYear(),mn=CM.getMonth(),off=(new Date(y,mn,1).getDay()+6)%7,dim=new Date(y,mn+1,0).getDate();let cal='';for(let i=0;i<off;i++)cal+='<span></span>';
+for(let d=1;d<=dim;d++){const k=dk(new Date(y,mn,d)),m=dm(k);cal+=`<i class="${lev(m,g)} ${k==today()?'td':''}" onclick="SD='${k}';render()">${d}${ev(k)?'•':''}<br><span style="font-size:9px">${m?fmt(m):''}</span></i>`}
+const dd=S.ses.filter(x=>x.d==SD),dd2=S.dsa.filter(x=>x.date==SD),dt=(S.tasks[SD]||[]).filter(x=>x.done);
+const pw=S.ses.filter(x=>x.d>=dk(ws())),byd={};pw.forEach(x=>{const n=new Date(x.d+'T00:00').toLocaleDateString(undefined,{weekday:'long'});byd[n]=(byd[n]||0)+x.dur});const bd=Object.entries(byd).sort((a,b)=>b[1]-a[1])[0];
+const wkm=S.dsa.filter(x=>x.date>=dk(ws())&&x.r!='f').length,pj=Math.round(pw.filter(x=>x.subj=='Projects'||x.subj=='Development').reduce((a,x)=>a+x.dur,0)/60),wk2=weak();
+return`<div class=g><div class=card><div class=m>Today</div><div class=big>${fmt(t)}</div></div><div class=card><div class=m>This week</div><div class=big>${fmt(wk)}</div></div><div class=card><div class=m>This month</div><div class=big>${fmt(mo)}</div></div><div class=card><div class=m>Total</div><div class=big>${fmt(tot)}</div></div></div>
+<div class=card style="margin-top:12px"><p style="margin:0">Goal: ${fmt(g)}/day · Actual: ${fmt(t)} · Achievement: ${(t/g*100).toFixed(1)}%</p><p class=m style="margin:4px 0 0">Average: ${fmt(tot/nd)}/day</p></div>
+<div class=card><h2>Streak 🔥 ${s.cur} days</h2><p class=m>Longest ${s.best} · Successful days ${s.ok} · Missed ${s.miss} · Weekly consistency ${s.wc}% · Monthly ${s.mc}%</p><div class=hm>${cells}</div></div>
+<div class=card><h2>Daily (14 days)</h2>${bars(days)}<h2 style="margin-top:12px">Weekly</h2>${bars(wks)}<h2 style="margin-top:12px">Monthly</h2>${bars(mos)}</div>
+<div class=card><h2>By subject</h2>${SUBJ.map(x=>`<div class="r m" style="margin:5px 0"><span style="width:42%">${x}</span><div style="flex:1">${bar(sm[x]/smx*100)}</div><span style="width:54px;text-align:right">${fmt(sm[x])}</span></div>`).join('')}</div>
+<div class=card><div class="r sp"><button onclick="CM=new Date(${y},${mn-1},1);render()">‹</button><b>${CM.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</b><button onclick="CM=new Date(${y},${mn+1},1);render()">›</button></div><br><div class=cal>${cal}</div>
+<h2 style="margin-top:12px">${SD}</h2>${dd.map(x=>`<p style="margin:3px 0">${new Date(x.s).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}–${new Date(x.e).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${fmt(x.dur/60)} · ${x.subj}${x.task?' · '+esc(x.task):''}</p>`).join('')||'<p class=m>No study sessions.</p>'}
+${dd2.map(x=>`<p class=m style="margin:2px 0">DSA: ${esc(x.n)} (${x.t}, ${x.r=='s'?'solved':x.r=='h'?'hints':'failed'})</p>`).join('')}${dt.map(x=>`<p class=m style="margin:2px 0">✓ ${esc(x.text)}</p>`).join('')}${S.int.filter(x=>x.dl==SD).map(x=>`<p class=m>📌 ${esc(x.c)} deadline</p>`).join('')}${S.proj.filter(x=>x.dl==SD).map(x=>`<p class=m>📌 ${esc(x.n)} deadline</p>`).join('')}</div>
+<div class=card><h2>Weekly report ${now.getDay()==0?'(ready today)':'(preview)'}</h2><p style="margin:3px 0">Study time: ${fmt(wk)} · Target: ${S.g.w}h · Completion: ${(wk/60/S.g.w*100).toFixed(1)}%</p><p style="margin:3px 0">DSA: ${wkm} problems · Projects/dev: ${pj}h · Streak: 🔥 ${s.cur} days</p><p style="margin:3px 0">Weakest area: ${wk2||'not enough data'} · Most productive day: ${bd?bd[0]:'—'}</p><p class=m>Next week's focus: ${wk2?wk2+' practice, ':''}${curTopic()} problems and daily revision of queued items.</p></div>`}
+const F=[['name','Name'],['college','College'],['branch','Degree / branch','B.Tech CSE'],['yr','Current year',['1','2','3','4']],['sem','Semester',['1','2','3','4','5','6','7','8']],['lang','Current programming language'],['lvl','DSA level',['Beginner','Intermediate','Advanced']],['dev','Development experience'],['cgpa','Current CGPA'],['gh','GitHub profile'],['hrs','Study hours per day','4'],['time','Preferred study time',['Morning','Afternoon','Evening','Night']],['grad','Target graduation year'],['goal','Career goal','Software engineer at Google'],['proj','Current projects'],['intern','Internship experience']];
+function onb(){$('#nav').hidden=true;$('#app').innerHTML=`<h1 style="margin:6px 0">🎯 Google Path</h1><p class=m>Answer a few questions and I'll build your roadmap and daily mission.</p><div class=card>${F.map(f=>Array.isArray(f[2])?`<label class=m>${f[1]}</label><select id=o_${f[0]}>${f[2].map((o,i)=>`<option value=${f[0]=='lvl'?i:o}>${o}</option>`).join('')}</select>`:`<label class=m>${f[1]}</label><input id=o_${f[0]} value="${f[2]||''}">`).join('')}<button class="p w" onclick=fin()>Create my plan</button></div>`}
+function fin(){const p={};F.forEach(f=>p[f[0]]=$('#o_'+f[0]).value.trim());if(!p.name){toast('Please enter your name');return}p.hrs=Math.max(.5,+p.hrs||4);p.yr=+p.yr||1;S.p=p;S.g={w:Math.round(p.hrs*7),m:Math.round(p.hrs*30)};
+if(p.proj)p.proj.split(',').filter(x=>x.trim()).forEach(n=>S.proj.push({n:n.trim(),tech:'',dl:'',pr:0}));save();render()}
+function render(){if(!S.p){onb();return}const v={home,tasks,dsa,road,ana};$('#app').innerHTML=v[V]();const n=$('#nav');n.hidden=false;n.innerHTML=[['home','🏠','Home'],['tasks','✅','Tasks'],['dsa','🧠','DSA'],['road','🗺️','Roadmap'],['ana','📊','Analytics']].map(x=>`<button class="${V==x[0]?'on':''}" onclick="go('${x[0]}')">${x[1]}<br>${x[2]}</button>`).join('')}
+render();
+</script></body></html>
